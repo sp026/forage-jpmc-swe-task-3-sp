@@ -8,9 +8,21 @@ interface IProps {
   data: ServerRespond[],
 }
 
+
 interface PerspectiveViewerElement extends HTMLElement {
   load: (table: Table) => void,
 }
+
+interface TableData {
+    price_abc: number,
+    price_def: number,
+    upper_bound: number,
+    lower_bound: number,
+    trigger_alert: number,
+    ratio: number,
+    timestamp: Date,
+
+    }
 class Graph extends Component<IProps, {}> {
   table: Table | undefined;
 
@@ -55,8 +67,7 @@ class Graph extends Component<IProps, {}> {
 
   componentDidUpdate() {  // whenever comopnent updates, aka getting new data
     if (this.table) {
-      this.table.update([
-        DataManipulator.generateRow(this.props.data), ] as unknown as TableData);
+      this.table.update([DataManipulator.generateRow(this.props.data),] as unknown as TableData);
     }
   }
 }

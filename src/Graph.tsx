@@ -22,11 +22,14 @@ class Graph extends Component<IProps, {}> {
     // Get element from the DOM.
     const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
 
-    const schema = {
-      stock: 'string',
-      top_ask_price: 'float',
-      top_bid_price: 'float',
-      timestamp: 'date',
+    const schema = {  // configures the table view of graph, the elements here are what shown, etc
+      price_abc: 'float',
+      price_def: 'float', // need prices of two stocks to calc ratio.. wont be shown
+      ratio: 'float',
+      upper_bound: 'float',
+      lower_bound: 'float', // upper & lower bounds
+      timestamp: 'date', // since its in respect to time, we need a timestamp ele
+      trigger_alert: 'float',
     };
 
     if (window.perspective && window.perspective.worker()) {
@@ -35,24 +38,25 @@ class Graph extends Component<IProps, {}> {
     if (this.table) {
       // Load the `table` in the `<perspective-viewer>` DOM reference.
       elem.load(this.table);
-      elem.setAttribute('view', 'y_line');
-      elem.setAttribute('column-pivots', '["stock"]');
-      elem.setAttribute('row-pivots', '["timestamp"]');
-      elem.setAttribute('columns', '["top_ask_price"]');
+      elem.setAttribute('view', 'y_line'); // view in graph
+      elem.setAttribute('row-pivots', '["timestamp"]'); // one axis as timestamp- row pivots is x axis
+      elem.setAttribute('columns', '["ratio", "upper_bound", "lower_bound", "trigger_alert"]'); // other axis has these elements
       elem.setAttribute('aggregates', JSON.stringify({
-        stock: 'distinctcount',
-        top_ask_price: 'avg',
-        top_bid_price: 'avg',
+        price_abc: 'avg',
+        price_def: 'avg',
+        ratio: 'avg',
+        upper_bound: 'avg',
+        lower_bound: 'avg',
         timestamp: 'distinct count',
+        trigger_alert: 'avg',
       }));
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate() {  // whenever comopnent updates, aka getting new data
     if (this.table) {
-      this.table.update(
-        DataManipulator.generateRow(this.props.data),
-      );
+      this.table.update([
+        DataManipulator.generateRow(this.props.data), ] as unknown as TableData);
     }
   }
 }
